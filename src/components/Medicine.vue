@@ -20,12 +20,11 @@ const props = defineProps({
 
 <template>
     <div class="w-58 flex flex-col border-2 rounded-lg p-4 bg-white">
-        <RouterLink :to="`/medicines/${props.medicine.id}`" rel="noopener">
-        
+
             <div class="self-center"> 
                 <Image :src="props.medicine.images[0]" alt="Image" imageClass="h-48 rounded-lg" width="230" />
             </div>
-        </RouterLink>
+        
         <div class="w-56 flex flex-col gap-1"> 
             <div v-if="medicineStore.getMinPrice(props.medicine.id) !== null" class="text-lg font-bold">
                 От {{ medicineStore.getMinPrice(props.medicine.id) }} BYN
@@ -41,7 +40,9 @@ const props = defineProps({
             </div>
         </div>
         <div class="mt-4 ">
-            <Button label="Подробнее" class="bg-green-600 p-2 text-white hover:bg-green-500" />
+    
+                <Button label="Подробнее" class="bg-green-600 p-2 text-white hover:bg-green-500" />
+
         </div>
     </div>
 </template>

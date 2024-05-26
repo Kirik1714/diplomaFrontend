@@ -54,10 +54,32 @@ const router = createRouter({
       path:'/basket',
       name:'basket',
       component:()=>import('../views/Basket.vue')       
-    }
+    },
+    {
+      path: "/orders/:id",
+      name: "Orders",
+      component: () => import("../views/Order.vue"),
+
+    },
 
  
   ]
 })
+router.beforeEach((to, from, next) => {
+  const access_token = localStorage.getItem("access_token");
+  if(access_token){
+    if(to.name ==="login" ||to.name ==="registration" ){
+      return next({ name: "home" })
+    }
+  }
+  if(!access_token){
+    if(to.name ==="Orders"){
+      return next({ name: "home" })
+    }
+  }
+ 
+
+  next();
+});
 
 export default router

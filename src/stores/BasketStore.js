@@ -19,14 +19,27 @@ export const useBasketStore = defineStore("basket", () => {
         item.medicine.id === medicine.medicine.id && item.pharmacy.id === pharmacyId
     );
 
+    // Получаем количество доступного товара в аптеке
+    const availableQuantity = medicine.pharmacies.quantity;
+
     if (existingMedicineIndex === -1) {
-        // Если такого товара в корзине еще нет, добавляем его с количеством 1
-        medicinesInBasket.value.push({ medicine: medicine.medicine, pharmacy: medicine.pharmacies, count: 1 });
+        // Если такого товара в корзине еще нет и количество доступно, добавляем его с количеством 1
+        if (availableQuantity > 0) {
+            medicinesInBasket.value.push({ medicine: medicine.medicine, pharmacy: medicine.pharmacies, count: 1 });
+        } else {
+            alert('Товар закончился на складе');
+        }
     } else {
-        // Если товар уже есть в корзине, увеличиваем его количество на 1
-        medicinesInBasket.value[existingMedicineIndex].count++;
+        // Если товар уже есть в корзине, проверяем доступное количество перед увеличением
+        const currentCount = medicinesInBasket.value[existingMedicineIndex].count;
+        if (currentCount < availableQuantity) {
+            medicinesInBasket.value[existingMedicineIndex].count++;
+        } else {
+            alert('К сожелению товар закончился в аптеке');
+        }
     }
 };
+
 
   const minusItemFromBasket = (medicineId, pharmacyId) => {
     const existingMedicine = medicinesInBasket.value.find(

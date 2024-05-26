@@ -103,7 +103,11 @@ watch(() => route.query.search, () => {
 
                     </div>
                     <div v-else v-for="medicine of medicineStore.medicines" :key="medicine.id">
+                        <RouterLink :to="`/medicines/${medicine.id}`" rel="noopener">
+                        
                         <Medicine :medicine="medicine" :suppliers="filterStore.suppliers" />
+
+                    </RouterLink>
                     </div>
 
                 </div>

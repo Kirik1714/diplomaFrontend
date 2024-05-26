@@ -1,15 +1,19 @@
 import { ref,  watch } from "vue";
+import { useBasketStore } from "./BasketStore.js";
+
 
 import api from "../api";
 import router from "../router";
 
 import { defineStore } from "pinia";
+import axios from "axios";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref(null);
 
-
+  const basketStore =useBasketStore();
   const error = ref({});
+  const orders = ref([]);
   const userInLocalStorage = localStorage.getItem("user");
 
   if (userInLocalStorage !== null) {
@@ -41,8 +45,17 @@ export const useUserStore = defineStore("user", () => {
           });
     
           localStorage.setItem("access_token", data.access_token);
-          getUser();
+          await getUser();
+           const user = JSON.parse(localStorage.getItem("user"));
+           console.log(user); 
+           console.log('Pinia',user.value); 
+
+          if (user.is_admin===1){
+            console.log('Админ');
+            window.open('http://backenddimploma/', '_blank'); // Открыть в новой вкладке
+          }
           router.push({ name: "medicines" });
+          error.value = {};
         } catch (errorInResponse) {
           error.value = errorInResponse.response.data;
           console.log('Ошибки авторизации',error.value);
@@ -68,6 +81,43 @@ export const useUserStore = defineStore("user", () => {
           console.log("Не удалось выйти", error);
         }
       };
+
+      const createOrder=async()=>{
+        if (!user.value) {
+          router.push({ name: 'login' });
+          return;
+        }
+       
+        const object = {
+
+          user_id: user.value?.id,
+          products: localStorage.getItem("medicinesInBasket"),
+          total_price: Number( basketStore.getTotalPrice()).toFixed(2),
+        };
+     console.log(object);
+
+        try {
+         const {data}=await axios.post('http://backenddimploma/api/medicines/orders',object);
+         localStorage.removeItem("medicinesInBasket");
+         basketStore.medicinesInBasket = [];
+      router.push({ name: "Orders", params: { id: user.value?.id } });
+
+        } catch (error) {
+      console.log("Не удалось создать заказ", error);
+          
+        }
+
+      }
+
+      const getOrders = async ( id) => {
+        try {
+          const { data } = await axios.get(`http://backenddimploma/api/medicines/orders/${id}`);
+          orders.value = data;
+        
+        } catch (error) {
+          console.log("Не удалось получить заказ", error);
+        }
+      };
       watch(
         user,
         (state) => {
@@ -78,5 +128,5 @@ export const useUserStore = defineStore("user", () => {
         }
       );
       
-      return {createUser, loginUser, getUser, user, error, logoutUser}
+      return {createUser, loginUser, getUser, user, error,orders, logoutUser,createOrder,getOrders}
 })

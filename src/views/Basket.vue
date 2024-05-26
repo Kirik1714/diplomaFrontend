@@ -1,8 +1,11 @@
 <script setup>
 import MedicineCartInBasket from '@/components/MedicineCartInBasket.vue';
 import EmptyBasket from '@/components/EmptyBasket.vue';
+import { useUserStore } from '../stores/UserStore.js';
 import { useBasketStore } from '../stores/BasketStore.js';
 const basketStore = useBasketStore();
+const  userStore= useUserStore();
+
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const basketStore = useBasketStore();
                             <div class="">Итого:</div>
                             <div class="font-semibold		">{{Number( basketStore.getTotalPrice()).toFixed(2) }} BYN</div>
                         </div>
-                        <Button label="ОФрмить заказ"  class="w-full"/>
+                        <Button label="Оформить заказ"  @click="userStore.createOrder()"  class="w-full"/>
     
                       
                      </div>
